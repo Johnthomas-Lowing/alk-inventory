@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALK | Assets</title>
+    <link rel="icon" href="./resources/favi.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="styles/modalStyles.css">
+    <link rel="stylesheet" type="text/css" href="styles/main.css">
+    
+</head>
+<body>
+
+<header>
+    <div class="banner">
+        <img class="logo" src="resources/logo-wide-white.png">
+    </div>
+</header>
+
+<section class="search-section">
+    <select id="category-dropdown">
+        <option value="">Location</option>
+        <option value="Vancouver">Vancouver</option>
+        <option value="Seattle">Seattle</option>
+        <option value="Phoenix">Phoenix</option>
+    </select>
+    <input type="text" placeholder="Search" id="search">
+    <button id="search-btn">Search</button>
+    <button id="reset-btn">Reset</button>
+    <button id="create-new-product">Create New Product</button>
+    <button id="reports" href="/reports.html">Reports</button>
+</section>
+
+<section class="inventory-grid">
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    <select id="action-select" style="border: none;" id="action-dropdown">
+                        <option value="">Action</option>
+                        <option value="Check-in">Check-in</option>
+                        <option value="Check-out">Check-out</option>
+                        <option style="color: red" value="Delete">Delete</option>
+                    </select>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic rows will be inserted here -->
+        </tbody>
+    </table>
+</section>
+
+<!-- General Modal -->
+<div id="general-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h2 id="modal-header">Header</h2>
+        <div id="modal-body"></div>
+        <form id="modal-form"></form>
+        <button id="modal-confirm-btn" type="button">Confirm</button>
+        <button id="modal-cancel-btn" type="button">Cancel</button>
+    </div>
+</div>
+
+
+
+<div class="commit-button-container">
+    <button id="commit-btn">Commit</button>
+</div>
+<script type="text/javascript" src="scripts/auth.js"></script>
+<script type="text/javascript" src="scripts/products.js"></script>
+</body>
+</html>
+
