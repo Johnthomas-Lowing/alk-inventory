@@ -1,36 +1,39 @@
-/* Bottom Navigation Bar Styles */
-.bottom-navbar {
-    position: fixed; /* Fix the navbar at the bottom of the viewport */
-    bottom: 0;
-    width: 100%; /* Ensure the navbar spans the full width */
-    background-color: #333; /* Set background color of the navbar */
-    color: white; /* Set text color */
-    text-align: center; /* Center text horizontally */
-    padding: 10px 0; /* Add padding */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+.banner {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.bottom-navbar ul {
-    list-style: none; /* Remove bullet points from list items */
-    margin: 0;
-    padding: 0;
-    display: flex; /* Use flexbox for horizontal alignment */
-    justify-content: space-around; /* Space items evenly */
+.logo {
+    padding-left: 1em;
+    height: 3em; /* Adjust as needed */
 }
 
-.bottom-navbar li {
-    display: inline; /* Display list items inline */
+.navbar {
+    display: flex;
+    gap: 1em; /* Spacing between buttons */
 }
 
-.bottom-navbar a {
-    color: white; /* Set link color */
-    text-decoration: none; /* Remove underline from links */
-    padding: 10px 20px; /* Add padding around links */
-    display: block; /* Ensure link takes up full block */
-    font-size: 1rem; /* Set font size */
+.navbar-button {
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 0.5em 1em;
+    cursor: pointer;
+    font-size: 1em;
+    margin-right: 1em;
 }
 
-.bottom-navbar a:hover {
-    background-color: #444; /* Change background color on hover */
-    text-decoration: underline; /* Add underline on hover */
+.navbar-button:hover {
+    background-color: white;
+    color: black;
 }

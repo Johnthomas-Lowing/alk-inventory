@@ -8,14 +8,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!response.ok) throw new Error('Failed to fetch reports');
 
             const reports = await response.json();
+
+            // Sort reports by created_at in descending order
+            reports.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
             displayReports(reports);
         } catch (err) {
             console.error('Error fetching reports:', err);
         }
     }
+
     document.getElementById('logo').addEventListener('click', function(){
         window.location.href = '/products.html';
-    })
+    });
 
     function displayReports(reports) {
         tbody.innerHTML = '';
@@ -35,7 +40,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </td>
                 <td>$${report.totalPrice.toFixed(2)}</td>
                 <td>${report.employeeName}</td>
-                <td>${new Date(report.created_at).toLocaleDateString()}</td>
+                <td>${new Date(report.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                })} ${new Date(report.created_at).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                })}</td>
             `;
             tbody.appendChild(row);
         });

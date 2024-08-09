@@ -7,15 +7,24 @@
     <link rel="icon" href="./resources/favi.png" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="styles/modalStyles.css">
     <link rel="stylesheet" type="text/css" href="styles/main.css">
-    
+    <link rel="stylesheet" type="text/css" href="styles/navbar.css">     
 </head>
 <body>
 
 <header>
     <div class="banner">
-        <img class="logo" src="resources/logo-wide-white.png">
+        <img class="logo" src="resources/logo-wide-white.png" alt="Logo">
+        <nav class="navbar">
+            <button id="reports" class="navbar-button admin-only" onclick="window.location.href='reports.html'">Reports</button>
+            <button id="create-new-product" class="navbar-button admin-only">Product Creation</button>
+            <button id="create-new-employee" class="navbar-button admin-only">Employee Creation</button>
+            <button id="create-new-user" class="navbar-button admin-only">User Creation</button>
+            <button class="navbar-button" onclick="window.location.href='/login/logout'">Log Out</button>
+
+        </nav>
     </div>
 </header>
+
 
 <section class="search-section">
     <select id="category-dropdown">
@@ -23,12 +32,12 @@
         <option value="Vancouver">Vancouver</option>
         <option value="Seattle">Seattle</option>
         <option value="Phoenix">Phoenix</option>
+        <option class='admin-only'value="Employees">Employees</option>
     </select>
     <input type="text" placeholder="Search" id="search">
     <button id="search-btn">Search</button>
     <button id="reset-btn">Reset</button>
-    <button id="create-new-product">Create New Product</button>
-    <button id="reports" href="/reports.html">Reports</button>
+    
 </section>
 
 <section class="inventory-grid">
@@ -40,7 +49,7 @@
                         <option value="">Action</option>
                         <option value="Check-in">Check-in</option>
                         <option value="Check-out">Check-out</option>
-                        <option style="color: red" value="Delete">Delete</option>
+                        <option class="admin-only" style="color: red" value="Delete">Delete</option>
                     </select>
                 </th>
             </tr>

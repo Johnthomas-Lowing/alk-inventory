@@ -24,11 +24,38 @@ function closeModal() {
     document.getElementById('general-modal').style.display = 'none';
 }
 
+async function handleEmployeeCreation() { //should be apart of prepareactionmodal?
+    const modalContent = {
+        header: 'Create New Employee',
+        body: '',
+        form: `
+            <input type="hidden" name="action" value="create-employee" />
+            <input type="text" name="first-name" placeholder="First Name" required />
+            <input type="text" name="last-name" placeholder="Last Name" required />
+            <input type="text" name="location" placeholder="Location" required />
+        `,
+    };
+
+    openModal(modalContent);
+}
+
+async function fetchEmployees() {
+    try {
+        const response = await fetch('/employee');
+        if (!response.ok) throw new Error('Failed to fetch employees');
+        const employees = await response.json();
+        // Update the UI or perform necessary actions with the employees data
+        console.log('Employees fetched:', employees);
+    } catch (err) {
+        console.error('Error fetching employees:', err);
+    }
+}
+
+
 async function prepareActionModal(action) {
     const selectedItems = Array.from(document.querySelectorAll('.select-item:checked'));
     const itemIds = selectedItems.map(item => item.dataset.id);
 
-    //Item creation
     if (action === 'create') {
         const modalContent = {
             header: 'Create New Product',
@@ -47,13 +74,11 @@ async function prepareActionModal(action) {
         return;
     }
 
-
     if (selectedItems.length === 0) {
         alert('No items selected for action.');
         return;
     }
 
-    
     try {
         const response = await fetch(`/inventory?ids=${itemIds.join(',')}`);
         if (!response.ok) throw new Error('Failed to fetch item details.');
@@ -97,7 +122,7 @@ async function prepareActionModal(action) {
                         <tr>
                             <td colspan="${action === 'Check-in' ? '4' : '3'}">
                                 <label for="employeeName">Employee Name:</label>
-                                <input type="text" id="employeeName" name="employeeName" required />
+                                <select id="employeeName" name="employeeName" required></select>
                             </td>
                         </tr>
                     ` : ''}
@@ -114,6 +139,23 @@ async function prepareActionModal(action) {
             form: formContent,
         };
         openModal(modalContent);
+
+        // Populate the employee dropdown
+        if (action === 'Check-out') {
+            const employeeSelect = document.getElementById('employeeName');
+            if (employeeSelect) {
+                try {
+                    const employeeResponse = await fetch('/employee');
+                    if (!employeeResponse.ok) throw new Error('Failed to fetch employees');
+
+                    const employees = await employeeResponse.json();
+                    employeeSelect.innerHTML = employees.map(employee => `<option value="${employee.name}">${employee.name}</option>`).join('');
+                } catch (err) {
+                    console.error('Error fetching employees:', err);
+                    alert('Error fetching employees. Please try again.');
+                }
+            }
+        }
     } catch (err) {
         console.error('Error fetching item details:', err);
         alert('There was an error fetching item details. Please try again.');
@@ -139,9 +181,9 @@ async function handleModalSubmit(event) {
 
     let endpoint, requestBody;
     const employeeName = formData.get('employeeName') || '';
+    const location = formData.get('location') || ''; // Retrieve location data
 
     if (action === 'create') {
-        // Handle creation of a new product
         const newItem = {
             name: formData.get('name'),
             color: formData.get('color'),
@@ -151,7 +193,7 @@ async function handleModalSubmit(event) {
             location: formData.get('location') || ''
         };
 
-        endpoint = '/inventory/add'; // Correct endpoint for creation
+        endpoint = '/inventory/add';
         requestBody = newItem;
 
         try {
@@ -168,72 +210,133 @@ async function handleModalSubmit(event) {
             const createdItem = await createResponse.json();
             console.log('Item created successfully:', createdItem);
 
-            // Generate a report after item creation
             await createReport('Create', [createdItem]);
 
-            // Refresh inventory list
             fetchInventory();
-            handleSearch();
         } catch (err) {
             console.error('Error creating item:', err);
+            alert('There was an error creating the item. Please check the input and try again.');
         } finally {
             closeModal();
         }
 
-        return; // Ensure no further code runs for 'create' action
+        return;
     }
 
-    // Handle other actions (delete, check-in, check-out)
-    if (action !== 'delete' && action !== 'check-in' && action !== 'check-out') {
+    if (action === 'create-employee') {
+        const employeeFirstName = formData.get('first-name') || '';
+        const employeeLastName = formData.get('last-name') || '';
+        const employeeLocation = formData.get('location') || '';
+
+        // Concatenate first and last names
+        const employeeFullName = `${employeeFirstName} ${employeeLastName}`.trim();
+
+        // Check if employee already exists
+        try {
+            const checkResponse = await fetch(`/employee?name=${encodeURIComponent(employeeFullName)}`);
+            if (!checkResponse.ok) throw new Error('Failed to check employee existence');
+
+            const existingEmployees = await checkResponse.json();
+            console.log('Existing Employees:', existingEmployees); // Debugging log
+
+            if (existingEmployees.length > 0) {
+                alert('Employee already exists.');
+                return;
+            }
+
+            const newEmployee = {
+                name: employeeFullName,
+                location: employeeLocation
+            };
+
+            endpoint = '/employee';
+            requestBody = newEmployee;
+
+            const createResponse = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+                credentials: 'include',
+            });
+
+            if (!createResponse.ok) throw new Error('Failed to create employee');
+            const createdEmployee = await createResponse.json();
+            console.log('Employee created successfully:', createdEmployee);
+
+            // Optionally, refresh employee data
+            fetchEmployees();
+        } catch (err) {
+            console.error('Error creating employee:', err);
+            alert('There was an error creating the employee. Please check the input and try again.');
+        } finally {
+            closeModal();
+        }
+
+        return;
+    }
+
+    if (action !== 'delete' && action !== 'check-in' && action !== 'check-out' && action !== 'search') {
         console.error('Invalid action:', action);
         return;
     }
 
-    // Prepare quantities and prices for each item
     const cartItems = ids.map(id => ({
         _id: id,
         quantity: parseInt(formData.get(`quantity-${id}`)) || 0,
-        price: parseFloat(formData.get(`price-${id}`)) || 0 // Ensure price is included
+        price: parseFloat(formData.get(`price-${id}`)) || 0
     }));
 
     console.log('Cart Items for Check-In/Check-Out:', cartItems); // Debugging log
 
-    // Check for stock availability if action is check-out
-    if (action === 'check-out') {
-        try {
-            const stockResponse = await fetch(`/inventory?ids=${ids.join(',')}`);
-            if (!stockResponse.ok) throw new Error('Failed to fetch stock details');
-            const stockItems = await stockResponse.json();
-
-            const insufficientStock = cartItems.some(cartItem => {
-                const stockItem = stockItems.find(item => item._id === cartItem._id);
-                return stockItem && cartItem.quantity > stockItem.quantity;
-            });
-
-            if (insufficientStock) {
-                alert('Requested quantity exceeds available stock for one or more items.');
-                return;
-            }
-        } catch (err) {
-            console.error('Error checking stock availability:', err);
-            alert('There was an error checking stock availability. Please try again.');
-            return;
-        }
-    }
-
-    // Set the endpoint and requestBody based on the action
     if (action === 'delete') {
         endpoint = '/inventory/delete';
         requestBody = { ids };
     } else if (action === 'check-in' || action === 'check-out') {
         endpoint = action === 'check-in' ? '/inventory/checkin' : '/inventory/checkout';
-        requestBody = { cartItems, employeeName };
+        requestBody = { cartItems, employeeName, location };
     }
 
+    try {
+        const { affectedItems, totalPrice } = await calculateReport(action, ids, cartItems);
+
+        const actionResponse = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+            credentials: 'include',
+        });
+
+        const actionResponseText = await actionResponse.text(); // Read response as text
+        if (!actionResponse.ok) {
+            if (actionResponseText.includes('Price must be greater than 0')) {
+                alert('One or more items have an invalid price. Please provide a valid price.');
+            } else {
+                throw new Error(`Failed to ${action}: ${actionResponseText}`);
+            }
+        } else {
+            console.log(`${action} successful:`, JSON.parse(actionResponseText));
+
+            await createReport(action, affectedItems, totalPrice, employeeName);
+
+            fetchInventory();
+            handleSearch();
+        }
+    } catch (err) {
+        console.error(`Error processing ${action}:`, err);
+        alert(`Error processing ${action}: ${err.message}`);
+    } finally {
+        closeModal();
+    }
+}
+
+async function calculateReport(action, ids, cartItems) {
     let affectedItems = [];
     let totalPrice = 0;
 
-    // Fetch affected items before performing the action
     try {
         const itemsResponse = await fetch(`/inventory?ids=${ids.join(',')}`);
         if (!itemsResponse.ok) throw new Error('Failed to fetch affected items');
@@ -253,34 +356,13 @@ async function handleModalSubmit(event) {
 
         console.log('Affected Items with User-Submitted Quantities:', affectedItems); // Debugging log
 
-        if (action === 'check-out') {
-            totalPrice = affectedItems.reduce((total, item) => total + (item.price * item.inputQuantity), 0);
-        }
+        totalPrice = affectedItems.reduce((total, item) => total + (item.price * item.inputQuantity), 0);
 
-        console.log('Generating Report:', { action, affectedItems, totalPrice, employeeName }); // Debugging log
-        // Generate the report with affected items
-        await createReport(action, affectedItems, totalPrice, employeeName);
+        return { affectedItems, totalPrice };
 
-        // Perform the action
-        const actionResponse = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-            credentials: 'include',
-        });
-
-        if (!actionResponse.ok) throw new Error(`Failed to ${action}`);
-        console.log(`${action} successful:`, await actionResponse.json());
-
-        // Refresh inventory list
-        fetchInventory();
-        handleSearch();
     } catch (err) {
-        console.error(`Error processing ${action}:`, err);
-    } finally {
-        closeModal();
+        console.error('Error calculating report:', err);
+        throw err; // Re-throw error to be handled by calling function
     }
 }
 
@@ -332,78 +414,108 @@ async function fetchInventory() {
     }
 }
 
-function displayItems(items) {
+function displayItems(items, category) {
     const tbody = document.querySelector('.inventory-grid tbody');
     tbody.innerHTML = '';
 
-    // Group items by name
-    const itemGroups = items.reduce((groups, item) => {
-        if (!groups[item.name]) {
-            groups[item.name] = [];
+    if (category === 'Employees') {
+        items.forEach(employee => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${employee.name}</td>
+                <td>${employee.location}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            `;
+            tbody.appendChild(row);
+        });
+    } else {
+        // Group items by name
+        const itemGroups = items.reduce((groups, item) => {
+            if (!groups[item.name]) {
+                groups[item.name] = [];
+            }
+            groups[item.name].push(item);
+            return groups;
+        }, {});
+
+        // Function to generate a URL-friendly image name based on the product name
+        function generateImageName(productName) {
+            return productName.replace(/\s+/g, '-').toLowerCase() + '.jpg'; // Replace spaces with dashes and convert to lowercase
         }
-        groups[item.name].push(item);
-        return groups;
-    }, {});
 
-    // Function to create a row for the parent item
-    function createParentRow(itemName, itemList) {
-        const row = document.createElement('tr');
-        row.classList.add('parent-item');
-        row.innerHTML = `
-            <td colspan="6">
-                <button class="expand-btn">+</button>
-                ${itemName}
-            </td>
-        `;
+        // Function to create a row for the parent item
+        function createParentRow(itemName, itemList) {
+            const row = document.createElement('tr');
+            row.classList.add('parent-item');
+            const imageName = generateImageName(itemName);
+            const imageUrl = `././uploads/products/${imageName}`; // Construct the image URL based on the product name
+            row.innerHTML = `
+                <td colspan="6">
+                    <img src="${imageUrl}" alt="${itemName}" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
+                    ${itemName}
+                </td>
+            `;
 
-        const detailsRow = document.createElement('tr');
-        detailsRow.classList.add('details-row');
-        detailsRow.style.display = 'none'; // Hidden by default
-        detailsRow.innerHTML = `
-            <td colspan="6">
-                <table class="subtable">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Color</th>
-                            <th>Size</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${itemList.map(item => `
+            const detailsRow = document.createElement('tr');
+            detailsRow.classList.add('details-row');
+            detailsRow.style.display = 'none'; // Hidden by default
+            detailsRow.innerHTML = `
+                <td colspan="6">
+                    <table class="subtable">
+                        <thead>
                             <tr>
-                                <td class="table-checkbox">
-                                    <input type="checkbox" class="select-item" data-id="${item._id}">
-                                    <span class="custom-checkbox"></span>
-                                </td>
-
-                                <td>${item.color || '-'}</td>
-                                <td>${item.size || '-'}</td>
-                                <td>${item.quantity}</td>
-                                <td>$${item.price.toFixed(2)}</td>
+                                <th></th>
+                                <th>Location</th>
+                                <th>Color</th>
+                                <th>Size</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </td>
-        `;
+                        </thead>
+                        <tbody>
+                            ${itemList.map(item => `
+                                <tr>
+                                    <td class="table-checkbox">
+                                        <input type="checkbox" class="select-item" data-id="${item._id}">
+                                        <span class="custom-checkbox"></span>
+                                    </td>
+                                    <td>${item.location ? item.location.slice(0, 3).toUpperCase() : '-'}</td>
+                                    <td>${item.color || '-'}</td>
+                                    <td>${item.size || '-'}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${item.price.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </td>
+            `;
 
-        tbody.appendChild(row);
-        tbody.appendChild(detailsRow);
+            row.addEventListener('click', () => {
+                const isVisible = detailsRow.style.display === 'table-row';
+                detailsRow.style.display = isVisible ? 'none' : 'table-row';
+            });
+
+            tbody.appendChild(row);
+            tbody.appendChild(detailsRow);
+        }
+
+        // Create rows for each group, sorting item names alphabetically
+        const sortedItemGroups = Object.entries(itemGroups).sort(([nameA], [nameB]) => nameA.localeCompare(nameB));
+
+        for (const [name, items] of sortedItemGroups) {
+            createParentRow(name, items);
+        }
+
+        // Add event listeners for expanding/collapsing rows
+        tbody.addEventListener('click', handleExpandClick);
     }
-
-    // Create rows for each group, sorting item names alphabetically
-    const sortedItemGroups = Object.entries(itemGroups).sort(([nameA], [nameB]) => nameA.localeCompare(nameB));
-    
-    for (const [name, items] of sortedItemGroups) {
-        createParentRow(name, items);
-    }
-
-    // Add event listeners for expanding/collapsing rows
-    tbody.addEventListener('click', handleExpandClick);
 }
+
+
 
 async function handleSearch() {
     const searchQuery = document.getElementById('search').value.trim();
@@ -411,17 +523,27 @@ async function handleSearch() {
 
     if (category === 'location' || category === '') {
         alert('Please choose a location from the dropdown.');
-        return; // Exit the function to prevent the search from running
+        return;
     }
 
     try {
-        const response = await fetch(`/inventory/filter?name=${searchQuery}&location=${category}`);
-        if (!response.ok) throw new Error('Failed to filter inventory');
-        displayItems(await response.json());
+        let items;
+        if (category === 'Employees') {
+            const response = await fetch('/employee');
+            if (!response.ok) throw new Error('Failed to fetch employees');
+            items = await response.json();
+        } else {
+            const response = await fetch(`/inventory/filter?name=${searchQuery}&location=${category}`);
+            if (!response.ok) throw new Error('Failed to filter inventory');
+            items = await response.json();
+        }
+
+        displayItems(items, category);
     } catch (err) {
-        console.error('Error filtering inventory:', err);
+        console.error('Error during search:', err);
     }
 }
+
 
 function handleReset() {
     document.getElementById('search').value = '';
@@ -449,11 +571,30 @@ function handleTableCellClick(event) {
     }
 }
 
-
-
-
-// Event listeners setup
 function setupEventListeners() {
+    document.getElementById("create-new-user").addEventListener("click", function() {
+    alert("Insufficient permissions for this action. Please contact your system's administrator.");
+});
+
+    document.getElementById('commit-btn').addEventListener('click', async () => {
+        const action = document.getElementById('action-select').value;
+        await prepareActionModal(action);
+    });
+
+    document.getElementById('create-new-product').addEventListener('click', () => {
+        prepareActionModal('create');
+    });
+
+    const createEmployeeBtn = document.getElementById('create-new-employee');
+    if (createEmployeeBtn) {
+        createEmployeeBtn.addEventListener('click', () => {
+            console.log('Create Employee button clicked'); // Debugging log
+            handleEmployeeCreation();
+        });
+    } else {
+        console.error('Create Employee button not found'); // Debugging log
+    }
+
     document.getElementById('search-btn').addEventListener('click', async () => {
         await handleSearch();
         // Ensure the event delegation is working correctly
@@ -466,30 +607,36 @@ function setupEventListeners() {
     document.querySelector('.inventory-grid tbody').addEventListener('click', handleExpandClick);
 
     document.getElementById('reports').addEventListener('click', function() {
-        window.location.href = '/reports.html'
+        window.location.href = '/reports.html';
     });
 
     document.querySelector('.inventory-grid').addEventListener('click', handleTableCellClick);
 }
 
+async function fetchSessionData() {
+    try {
+        const response = await fetch('/login/session');
+        if (!response.ok) throw new Error('Failed to fetch session data');
 
+        const data = await response.json();
+        updateButtonVisibility(data);
+    } catch (err) {
+        console.error('Error fetching session data:', err);
+    }
+}
+
+function updateButtonVisibility(userData) {
+    const adminOnlyButtons = document.querySelectorAll('.admin-only');
+
+    if (userData.role === 'admin') {
+        adminOnlyButtons.forEach(button => button.style.display = 'block');
+    } else {
+        adminOnlyButtons.forEach(button => button.style.display = 'none');
+    }
+}
 
 // Initial setup
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('commit-btn').addEventListener('click', async () => {
-    const action = document.getElementById('action-select').value;
-
-    if (action !== 'create' && (action === 'location' || action === '')) {
-        alert('Please choose a location from the dropdown.');
-        return; // Exit the function to prevent further processing
-    }
-
-    await prepareActionModal(action);
-});
-
-    document.getElementById('create-new-product').addEventListener('click', () => {
-        prepareActionModal('create');
-    });
-
     setupEventListeners();
+    fetchSessionData();
 });

@@ -5,20 +5,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>ALK | Reports</title>
     <link rel="icon" href="./resources/favi.png" type="image/x-icon">
-    <link rel="stylesheet" href="styles/main.css"> 
+    <link rel="stylesheet" type="text/css" href="styles/main.css">
+    <link rel="stylesheet" type="text/css" href="styles/navbar.css"> 
 </head>
 <body>
-    <header>
-    	<div class="banner">
-        	<img id="logo" class="logo" src="resources/logo-wide-white.png">
-    	</div>
-    	<br>
-    	<br>
-    	<br>
-        <h1>Reports</h1>
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Search reports...">
-        </div>
+<header>
+    <div class="banner">
+        <img id="logo" class="logo" src="resources/logo-wide-white.png" alt="Logo">
+        <nav class="navbar">
+            <button class="navbar-button admin-only" onclick="window.location.href='products.html'">Products</button>
+        </nav>
+    </div>
+</header>
+
+
+    	
+        <div style="display: flex; justify-content: center; align-items: center; margin-top: 4.5em;" class="search-container">
+    <input type="text" id="search-input" placeholder="Search reports...">
+</div>
     </header>
     <main>
     	<br>

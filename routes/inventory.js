@@ -72,7 +72,6 @@ router.post('/checkout', async (req, res) => {
     }
 });
 
-// POST request to check in items to the inventory
 router.post('/checkin', async (req, res) => {
     const { cartItems } = req.body;
 
@@ -90,19 +89,22 @@ router.post('/checkin', async (req, res) => {
             console.log('Processing Cart Item:', { _id, quantity, price });
 
             // Validate cart item data
-            if (!_id || typeof quantity !== 'number' || quantity <= 0 || typeof price !== 'number' || price <= 0) {
-    console.error('Invalid cart item data:', cartItem);
-    return res.status(400).json({ error: 'Invalid cart item data', item: cartItem });
-}
+            if (!_id || typeof quantity !== 'number' || quantity <= 0) {
+                console.error('Invalid cart item data:', cartItem);
+                return res.status(400).json({ error: 'Invalid cart item data', item: cartItem });
+            }
 
+            // Check if price is valid
+            if (typeof price !== 'number' || price <= 0) {
+                console.error('Invalid price data:', cartItem);
+                return res.status(400).json({ error: 'Price must be greater than 0', item: cartItem });
+            }
 
             const item = await Inventory.findById(_id);
             if (!item) {
                 console.error(`Item with ID ${_id} not found.`);
                 return res.status(404).json({ error: 'Item not found' });
             }
-
-            console.log(`Current item data: ${JSON.stringify(item)}`);
 
             // Calculate the new average price
             const currentTotalPrice = item.quantity * item.price;
@@ -135,6 +137,7 @@ router.post('/checkin', async (req, res) => {
         res.status(500).json({ error: 'Failed to check in items' });
     }
 });
+
 
 
 

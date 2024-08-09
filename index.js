@@ -8,6 +8,7 @@ import loginRoutes from './routes/login.js';
 import inventoryRoutes from './routes/inventory.js';
 import reportRoutes from './routes/report.js';
 import userRoutes from './routes/user.js';
+import employeeRoutes from './routes/employee.js';
 import connectDB from './db.js';
 import { isAuthenticated } from './middleware/auth.js'; // Import the middleware
 
@@ -45,6 +46,7 @@ app.use((req, res, next) => {
 
 // Serve static files from the 'public' directory
 app.use(express.static(publicDirectoryPath));
+app.use('/uploads/products', express.static(path.join(__dirname, 'uploads/products')));
 
 // Serve products page with authentication check
 app.get('/products', isAuthenticated, (req, res) => {
@@ -58,7 +60,8 @@ app.use('/session', loginRoutes);
 // Protected routes
 app.use('/reports', isAuthenticated, reportRoutes);
 app.use('/inventory', isAuthenticated, inventoryRoutes);
-app.use('/users', isAuthenticated, userRoutes);
+app.use('/employee', isAuthenticated, employeeRoutes);
+app.use('/users',  isAuthenticated, userRoutes);
 
 
 // Start the server

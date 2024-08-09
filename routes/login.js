@@ -16,8 +16,11 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
+        // Set session data including role
         req.session.username = username;
-        res.status(200).json({ message: 'Login successful' });
+        req.session.role = user.role;
+
+        res.status(200).json({ message: 'Login successful', username: username, role: user.role });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -26,12 +29,11 @@ router.post('/login', async (req, res) => {
 
 router.get('/session', (req, res) => {
     if (req.session.username) {
-        res.status(200).json({ username: req.session.username });
+        res.status(200).json({ username: req.session.username, role: req.session.role });
     } else {
         res.status(401).json({ error: 'Not authenticated' });
     }
 });
-
 
 router.get('/logout', (req, res) => {
     req.session.destroy(err => {
@@ -41,6 +43,5 @@ router.get('/logout', (req, res) => {
         res.redirect('/'); // Redirect to the homepage after logging out
     });
 });
-
 
 export default router;
