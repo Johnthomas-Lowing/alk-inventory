@@ -1,4 +1,4 @@
-//modal
+//Modals
 function openModal(modalContent) {
     const modal = document.getElementById('general-modal');
     document.getElementById('modal-header').innerHTML = modalContent.header;
@@ -24,7 +24,7 @@ function closeModal() {
     document.getElementById('general-modal').style.display = 'none';
 }
 
-async function handleEmployeeCreation() { //should be apart of prepareactionmodal?
+async function handleEmployeeCreation() {
     const modalContent = {
         header: 'Create New Employee',
         body: '',
@@ -39,20 +39,12 @@ async function handleEmployeeCreation() { //should be apart of prepareactionmoda
     openModal(modalContent);
 }
 
-async function fetchEmployees() {
-    try {
-        const response = await fetch('/employee');
-        if (!response.ok) throw new Error('Failed to fetch employees');
-        const employees = await response.json();
-        // Update the UI or perform necessary actions with the employees data
-        console.log('Employees fetched:', employees);
-    } catch (err) {
-        console.error('Error fetching employees:', err);
-    }
-}
-
-
 async function prepareActionModal(action) {
+     if (!action || action === 'action') {
+        alert('Please choose a valid action.');
+        return;
+    }
+
     const selectedItems = Array.from(document.querySelectorAll('.select-item:checked'));
     const itemIds = selectedItems.map(item => item.dataset.id);
 
@@ -88,7 +80,7 @@ async function prepareActionModal(action) {
 
         let formContent = `
             <input type="hidden" name="action" value="${action.toLowerCase()}" />
-            <input type="hidden" name="ids" value="${itemIds.join(',')}" />
+            <input type="hidden" name="ids" value="${itemIds.join(',')}" /> <!-- Add IDs to form -->
             <table>
                 <thead>
                     <tr>
@@ -140,7 +132,6 @@ async function prepareActionModal(action) {
         };
         openModal(modalContent);
 
-        // Populate the employee dropdown
         if (action === 'Check-out') {
             const employeeSelect = document.getElementById('employeeName');
             if (employeeSelect) {
@@ -156,6 +147,7 @@ async function prepareActionModal(action) {
                 }
             }
         }
+
     } catch (err) {
         console.error('Error fetching item details:', err);
         alert('There was an error fetching item details. Please try again.');
@@ -163,8 +155,7 @@ async function prepareActionModal(action) {
 }
 
 async function handleModalSubmit(event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-    console.log('Confirm button clicked'); // Debugging log
+    event.preventDefault(); // Prevent default form submission behavior
 
     const form = document.getElementById('modal-form');
     if (!form) {
@@ -179,123 +170,131 @@ async function handleModalSubmit(event) {
 
     console.log('Form Data:', { action, ids }); // Debugging log
 
-    let endpoint, requestBody;
-    const employeeName = formData.get('employeeName') || '';
-    const location = formData.get('location') || ''; // Retrieve location data
+    switch (action) {
+        case 'create':
+            await handleCreateItem(formData);
+            break;
+        case 'create-employee':
+            await handleCreateEmployee(formData);
+            break;
+        case 'delete':
+        case 'check-in':
+        case 'check-out':
+        case 'search':
+            await handleInventoryAction(action, formData, ids);
+            break;
+        default:
+            console.error('Invalid action:', action);
+    }
+}
 
-    if (action === 'create') {
-        const newItem = {
-            name: formData.get('name'),
-            color: formData.get('color'),
-            size: formData.get('size'),
-            quantity: parseInt(formData.get('quantity')) || 0,
-            price: parseFloat(formData.get('price')) || 0,
-            location: formData.get('location') || ''
+async function handleCreateItem(formData) {
+    const newItem = {
+        name: formData.get('name'),
+        color: formData.get('color'),
+        size: formData.get('size'),
+        quantity: parseInt(formData.get('quantity')) || 0,
+        price: parseFloat(formData.get('price')) || 0,
+        location: formData.get('location') || ''
+    };
+
+    try {
+        const createResponse = await fetch('/inventory/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newItem),
+            credentials: 'include',
+        });
+
+        if (!createResponse.ok) throw new Error('Failed to create item');
+        const createdItem = await createResponse.json();
+        console.log('Item created successfully:', createdItem);
+
+        await createReport('Create', [createdItem]);
+
+        fetchInventory();
+    } catch (err) {
+        console.error('Error creating item:', err);
+        alert('There was an error creating the item. Please check the input and try again.');
+    } finally {
+        closeModal();
+    }
+}
+
+async function handleCreateEmployee(formData) {
+    const employeeFirstName = formData.get('first-name') || '';
+    const employeeLastName = formData.get('last-name') || '';
+    const employeeLocation = formData.get('location') || '';
+
+    const employeeFullName = `${employeeFirstName} ${employeeLastName}`.trim();
+
+    try {
+        const checkResponse = await fetch(`/employee?name=${encodeURIComponent(employeeFullName)}`);
+        if (!checkResponse.ok) throw new Error('Failed to check employee existence');
+
+        const existingEmployees = await checkResponse.json();
+        console.log('Existing Employees:', existingEmployees); // Debugging log
+
+        if (existingEmployees.length > 0) {
+            alert('Employee already exists.');
+            return;
+        }
+
+        const newEmployee = {
+            name: employeeFullName,
+            location: employeeLocation
         };
 
-        endpoint = '/inventory/add';
-        requestBody = newItem;
+        const createResponse = await fetch('/employee', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newEmployee),
+            credentials: 'include',
+        });
 
-        try {
-            const createResponse = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-                credentials: 'include',
-            });
+        if (!createResponse.ok) throw new Error('Failed to create employee');
+        const createdEmployee = await createResponse.json();
+        console.log('Employee created successfully:', createdEmployee);
 
-            if (!createResponse.ok) throw new Error('Failed to create item');
-            const createdItem = await createResponse.json();
-            console.log('Item created successfully:', createdItem);
-
-            await createReport('Create', [createdItem]);
-
-            fetchInventory();
-        } catch (err) {
-            console.error('Error creating item:', err);
-            alert('There was an error creating the item. Please check the input and try again.');
-        } finally {
-            closeModal();
-        }
-
-        return;
+        fetchEmployees();
+    } catch (err) {
+        console.error('Error creating employee:', err);
+        alert('There was an error creating the employee. Please check the input and try again.');
+    } finally {
+        closeModal();
     }
+}
 
-    if (action === 'create-employee') {
-        const employeeFirstName = formData.get('first-name') || '';
-        const employeeLastName = formData.get('last-name') || '';
-        const employeeLocation = formData.get('location') || '';
-
-        // Concatenate first and last names
-        const employeeFullName = `${employeeFirstName} ${employeeLastName}`.trim();
-
-        // Check if employee already exists
-        try {
-            const checkResponse = await fetch(`/employee?name=${encodeURIComponent(employeeFullName)}`);
-            if (!checkResponse.ok) throw new Error('Failed to check employee existence');
-
-            const existingEmployees = await checkResponse.json();
-            console.log('Existing Employees:', existingEmployees); // Debugging log
-
-            if (existingEmployees.length > 0) {
-                alert('Employee already exists.');
-                return;
-            }
-
-            const newEmployee = {
-                name: employeeFullName,
-                location: employeeLocation
-            };
-
-            endpoint = '/employee';
-            requestBody = newEmployee;
-
-            const createResponse = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-                credentials: 'include',
-            });
-
-            if (!createResponse.ok) throw new Error('Failed to create employee');
-            const createdEmployee = await createResponse.json();
-            console.log('Employee created successfully:', createdEmployee);
-
-            // Optionally, refresh employee data
-            fetchEmployees();
-        } catch (err) {
-            console.error('Error creating employee:', err);
-            alert('There was an error creating the employee. Please check the input and try again.');
-        } finally {
-            closeModal();
-        }
-
-        return;
-    }
-
-    if (action !== 'delete' && action !== 'check-in' && action !== 'check-out' && action !== 'search') {
-        console.error('Invalid action:', action);
-        return;
-    }
-
+async function handleInventoryAction(action, formData, ids) {
     const cartItems = ids.map(id => ({
         _id: id,
         quantity: parseInt(formData.get(`quantity-${id}`)) || 0,
         price: parseFloat(formData.get(`price-${id}`)) || 0
     }));
+    const employeeName = formData.get('employeeName') || '';
+    const location = formData.get('location') || '';
 
     console.log('Cart Items for Check-In/Check-Out:', cartItems); // Debugging log
 
+    let endpoint;
+    let body;
+
     if (action === 'delete') {
         endpoint = '/inventory/delete';
-        requestBody = { ids };
-    } else if (action === 'check-in' || action === 'check-out') {
-        endpoint = action === 'check-in' ? '/inventory/checkin' : '/inventory/checkout';
-        requestBody = { cartItems, employeeName, location };
+        body = { ids }; // Pass IDs as an object
+    } else if (action === 'check-in') {
+        endpoint = '/inventory/checkin';
+        body = { cartItems, employeeName, location };
+    } else if (action === 'check-out') {
+        endpoint = '/inventory/checkout';
+        body = { cartItems, employeeName, location };
+    } else {
+        console.error('Invalid action:', action);
+        return;
     }
 
     try {
@@ -306,7 +305,7 @@ async function handleModalSubmit(event) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(requestBody),
+            body: JSON.stringify(body),
             credentials: 'include',
         });
 
@@ -333,77 +332,37 @@ async function handleModalSubmit(event) {
     }
 }
 
-async function calculateReport(action, ids, cartItems) {
-    let affectedItems = [];
-    let totalPrice = 0;
+//Buttons & Dropdowns
+function handleReset() {
+    document.getElementById('search').value = '';
+    document.getElementById('category-dropdown').value = '';
+    fetchInventory();
+}
 
-    try {
-        const itemsResponse = await fetch(`/inventory?ids=${ids.join(',')}`);
-        if (!itemsResponse.ok) throw new Error('Failed to fetch affected items');
-        affectedItems = await itemsResponse.json();
+function updateButtonVisibility(userData) {
+    const adminOnlyButtons = document.querySelectorAll('.admin-only');
 
-        // Filter affectedItems based on the action
-        affectedItems = affectedItems.filter(item => ids.includes(item._id));
-
-        affectedItems = affectedItems.map(item => {
-            const cartItem = cartItems.find(cartItem => cartItem._id === item._id);
-            return {
-                ...item,
-                quantity: cartItem.quantity, // Directly use user-submitted quantity
-                inputQuantity: cartItem.quantity // Ensure this is correctly set
-            };
-        });
-
-        console.log('Affected Items with User-Submitted Quantities:', affectedItems); // Debugging log
-
-        totalPrice = affectedItems.reduce((total, item) => total + (item.price * item.inputQuantity), 0);
-
-        return { affectedItems, totalPrice };
-
-    } catch (err) {
-        console.error('Error calculating report:', err);
-        throw err; // Re-throw error to be handled by calling function
+    if (userData.role === 'admin') {
+        adminOnlyButtons.forEach(button => button.style.display = 'block');
+    } else {
+        adminOnlyButtons.forEach(button => button.style.display = 'none');
     }
 }
 
-//reports
-async function createReport(action, items, totalPrice = 0, employeeName = '') {
+
+//Inventory & Search
+async function fetchEmployees() {
     try {
-        const response = await fetch('/login/session');
-        if (!response.ok) throw new Error('Failed to fetch username');
-
-        const data = await response.json();
-        const username = data.username;
-
-        const report = {
-            username,
-            action,
-            items: items.map(item => ({
-                ...item,
-                inputQuantity: item.inputQuantity // Ensure inputQuantity is included and used
-            })),
-            totalPrice,
-            employeeName
-        };
-
-        console.log('Report Payload:', report); // Debugging log
-
-        const reportResponse = await fetch('/reports', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(report),
-        });
-
-        if (!reportResponse.ok) throw new Error('Failed to create report');
-        console.log('Report created:', await reportResponse.json());
+        const response = await fetch('/employee');
+        if (!response.ok) throw new Error('Failed to fetch employees');
+        const employees = await response.json();
+        // Update the UI or perform necessary actions with the employees data
+        console.log('Employees fetched:', employees);
     } catch (err) {
-        console.error('Error creating report:', err);
+        console.error('Error fetching employees:', err);
     }
 }
 
-//inventory
 async function fetchInventory() {
     try {
         const response = await fetch('/inventory');
@@ -454,7 +413,7 @@ function displayItems(items, category) {
             const imageUrl = `././uploads/products/${imageName}`; // Construct the image URL based on the product name
             row.innerHTML = `
                 <td colspan="6">
-                    <img src="${imageUrl}" alt="${itemName}" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
+                    <img src="${imageUrl}" alt="${itemName}" style="max-height: 2em; vertical-align: middle; margin-right: 10px;">
                     ${itemName}
                 </td>
             `;
@@ -515,8 +474,6 @@ function displayItems(items, category) {
     }
 }
 
-
-
 async function handleSearch() {
     const searchQuery = document.getElementById('search').value.trim();
     const category = document.getElementById('category-dropdown').value;
@@ -544,13 +501,6 @@ async function handleSearch() {
     }
 }
 
-
-function handleReset() {
-    document.getElementById('search').value = '';
-    document.getElementById('category-dropdown').value = '';
-    fetchInventory();
-}
-
 function handleExpandClick(event) {
     if (event.target.classList.contains('expand-btn')) {
         const parentRow = event.target.closest('tr');
@@ -568,6 +518,91 @@ function handleTableCellClick(event) {
         if (checkbox) {
             checkbox.checked = !checkbox.checked; // Toggle checkbox state
         }
+    }
+}
+
+
+//Reports
+async function calculateReport(action, ids, cartItems) {
+    let affectedItems = [];
+    let totalPrice = 0;
+
+    try {
+        const itemsResponse = await fetch(`/inventory?ids=${ids.join(',')}`);
+        if (!itemsResponse.ok) throw new Error('Failed to fetch affected items');
+        affectedItems = await itemsResponse.json();
+
+        // Filter affectedItems based on the action
+        affectedItems = affectedItems.filter(item => ids.includes(item._id));
+
+        affectedItems = affectedItems.map(item => {
+            const cartItem = cartItems.find(cartItem => cartItem._id === item._id);
+            return {
+                ...item,
+                quantity: cartItem.quantity, // Directly use user-submitted quantity
+                inputQuantity: cartItem.quantity // Ensure this is correctly set
+            };
+        });
+
+        console.log('Affected Items with User-Submitted Quantities:', affectedItems); // Debugging log
+
+        totalPrice = affectedItems.reduce((total, item) => total + (item.price * item.inputQuantity), 0);
+
+        return { affectedItems, totalPrice };
+
+    } catch (err) {
+        console.error('Error calculating report:', err);
+        throw err; // Re-throw error to be handled by calling function
+    }
+}
+
+async function createReport(action, items, totalPrice = 0, employeeName = '') {
+    try {
+        const response = await fetch('/login/session');
+        if (!response.ok) throw new Error('Failed to fetch username');
+
+        const data = await response.json();
+        const username = data.username;
+
+        const report = {
+            username,
+            action,
+            items: items.map(item => ({
+                ...item,
+                inputQuantity: item.inputQuantity // Ensure inputQuantity is included and used
+            })),
+            totalPrice,
+            employeeName
+        };
+
+        console.log('Report Payload:', report); // Debugging log
+
+        const reportResponse = await fetch('/reports', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(report),
+        });
+
+        if (!reportResponse.ok) throw new Error('Failed to create report');
+        console.log('Report created:', await reportResponse.json());
+    } catch (err) {
+        console.error('Error creating report:', err);
+    }
+}
+
+
+//Setup & Auth
+async function fetchSessionData() {
+    try {
+        const response = await fetch('/login/session');
+        if (!response.ok) throw new Error('Failed to fetch session data');
+
+        const data = await response.json();
+        updateButtonVisibility(data);
+    } catch (err) {
+        console.error('Error fetching session data:', err);
     }
 }
 
@@ -613,29 +648,6 @@ function setupEventListeners() {
     document.querySelector('.inventory-grid').addEventListener('click', handleTableCellClick);
 }
 
-async function fetchSessionData() {
-    try {
-        const response = await fetch('/login/session');
-        if (!response.ok) throw new Error('Failed to fetch session data');
-
-        const data = await response.json();
-        updateButtonVisibility(data);
-    } catch (err) {
-        console.error('Error fetching session data:', err);
-    }
-}
-
-function updateButtonVisibility(userData) {
-    const adminOnlyButtons = document.querySelectorAll('.admin-only');
-
-    if (userData.role === 'admin') {
-        adminOnlyButtons.forEach(button => button.style.display = 'block');
-    } else {
-        adminOnlyButtons.forEach(button => button.style.display = 'none');
-    }
-}
-
-// Initial setup
 document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     fetchSessionData();
