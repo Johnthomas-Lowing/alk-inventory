@@ -23,32 +23,33 @@
         </footer>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const yearElement = document.getElementById('currentYear');
-            const currentYear = new Date().getFullYear();
-            yearElement.textContent = currentYear;
-        });
         async function login(event) {
-            event.preventDefault();
+    event.preventDefault();
 
-            const username = document.getElementById('username').value.toLowerCase();
-            const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value.toLowerCase();
+    const password = document.getElementById('password').value;
 
-            const response = await fetch('/login/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-                credentials: 'same-origin'
-            });
+    try {
+        const response = await fetch('/login/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+            credentials: 'same-origin'
+        });
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (response.ok) {
-                window.location.href = '/products.html';
-            } else {
-                alert(data.message);
-            }
+        if (response.ok) {
+            window.location.href = '/products.html';
+        } else {
+            alert(data.error || 'An unexpected error occurred. Please try again.');
         }
+    } catch (err) {
+        console.error('An error occurred:', err);
+        alert('An unexpected error occurred. Please try again later.');
+    }
+}
+
     </script>
 </body>
 </html>

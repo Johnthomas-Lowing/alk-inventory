@@ -409,11 +409,16 @@ function displayItems(items, category) {
         function createParentRow(itemName, itemList) {
             const row = document.createElement('tr');
             row.classList.add('parent-item');
+            
             const imageName = generateImageName(itemName);
             const imageUrl = `././uploads/products/${imageName}`; // Construct the image URL based on the product name
+            const altImageUrl = '././uploads/products/alt-image.jpg'; // The alternative image URL
+
             row.innerHTML = `
                 <td colspan="6">
-                    <img src="${imageUrl}" alt="${itemName}" style="max-height: 2em; vertical-align: middle; margin-right: 10px;">
+                    <img src="${imageUrl}" alt="${itemName}" 
+                         style="max-height: 3em; vertical-align: middle; margin-right: 10px;"
+                         onerror="this.onerror=null;this.src='${altImageUrl}';">
                     ${itemName}
                 </td>
             `;
@@ -520,7 +525,6 @@ function handleTableCellClick(event) {
         }
     }
 }
-
 
 //Reports
 async function calculateReport(action, ids, cartItems) {

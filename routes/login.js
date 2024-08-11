@@ -13,7 +13,7 @@ router.post('/login', async (req, res) => {
 
         const user = await User.findOne({ username });
         if (!user || !(await user.verifyPassword(password))) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Your account details are incorrect. Check your username and password. Contact your system\'s administrator for further assistance.' });
         }
 
         // Set session data including role
