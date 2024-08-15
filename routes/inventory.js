@@ -138,10 +138,6 @@ router.post('/checkin', async (req, res) => {
     }
 });
 
-
-
-
-
 router.post('/add', isAuthenticated, async (req, res) => {
     const { name, location, color, size, quantity, price } = req.body;
 
@@ -247,11 +243,10 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-// PATCH request to adjust inventory quantity
-router.patch('/:id/quantity/:action', async (req, res) => {
+// PATCH request to adjust item names, colors, sizes.
+router.patch('/:id', async (req, res) => {
     const itemId = req.params.id;
-    const action = req.params.action;
-    const { amount } = req.body;
+    const { name, color, size } = req.body;
 
     try {
         const item = await Inventory.findById(itemId);
@@ -260,23 +255,18 @@ router.patch('/:id/quantity/:action', async (req, res) => {
             return res.status(404).json({ error: 'Item not found' });
         }
 
-        if (action === 'add') {
-            item.quantity += amount;
-        } else if (action === 'remove') {
-            item.quantity -= amount;
-            if (item.quantity < 0) {
-                item.quantity = 0;
-            }
-        } else {
-            return res.status(400).json({ error: 'Invalid action' });
-        }
+        // Update fields if provided in the request body
+        if (name) item.name = name;
+        if (color) item.color = color;
+        if (size) item.size = size;
 
         await item.save();
         res.status(200).json(item);
     } catch (error) {
-        console.error('Error updating stock:', error);
+        console.error('Error updating item:', error);
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 export default router;

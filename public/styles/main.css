@@ -166,3 +166,5 @@ input[type="checkbox"]:checked + .custom-checkbox::before {
     font-size: 16px; /* Adjust size as needed */
     line-height: 20px; /* Align the X */
 }
+
+

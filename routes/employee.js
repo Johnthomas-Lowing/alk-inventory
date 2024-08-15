@@ -36,27 +36,37 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Create a new employee
+// Create multiple new employees
 router.post('/', async (req, res) => {
-    const { name, location } = req.body;
+    const employees = req.body.employees;
 
     // Input validation
-    if (!name || !location) {
-        return res.status(400).json({ message: 'Name and location are required' });
+    if (!Array.isArray(employees) || employees.length === 0) {
+        return res.status(400).json({ message: 'Employees array is required' });
     }
 
     try {
-        // Check if the employee already exists
-        const existingEmployee = await Employee.findOne({ name });
-        if (existingEmployee) {
-            return res.status(400).json({ message: 'Employee already exists' });
+        const newEmployees = [];
+        for (const employeeData of employees) {
+            const { name, location } = employeeData;
+
+            if (!name || !location) {
+                return res.status(400).json({ message: 'Name and location are required for each employee' });
+            }
+
+            // Check if the employee already exists
+            const existingEmployee = await Employee.findOne({ name });
+            if (existingEmployee) {
+                return res.status(400).json({ message: `Employee ${name} already exists` });
+            }
+
+            // Create the new employee
+            const employee = new Employee({ name, location });
+            const newEmployee = await employee.save();
+            newEmployees.push(newEmployee);
         }
 
-        // Create the new employee
-        const employee = new Employee({ name, location });
-        const newEmployee = await employee.save();
-
-        res.status(201).json(newEmployee);
+        res.status(201).json(newEmployees);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

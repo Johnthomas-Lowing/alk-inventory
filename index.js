@@ -58,10 +58,10 @@ app.use('/login', loginRoutes);
 app.use('/session', loginRoutes);
 
 // Protected routes
-app.use('/reports', reportRoutes);
+app.use('/reports', isAuthenticated, reportRoutes);
 app.use('/inventory', isAuthenticated, inventoryRoutes);
-app.use('/employee', employeeRoutes);
-app.use('/users', userRoutes);
+app.use('/employee', isAuthenticated, employeeRoutes);
+app.use('/users', isAuthenticated, userRoutes);
 
 
 // Start the server
