@@ -15,15 +15,19 @@
     <div class="banner">
         <img class="logo" src="resources/logo-wide-white.png" alt="Logo">
         <nav class="navbar">
-            <button id="reports" class="navbar-button admin-only" onclick="window.location.href='reports.html'">Reports</button>
-            <button id="create-new-product" class="navbar-button admin-only">Product Creation</button>
-            <button id="create-new-employee" class="navbar-button admin-only">Employee Creation</button>
-            <button id="create-new-user" class="navbar-button admin-only">User Creation</button>
-            <button class="navbar-button" onclick="window.location.href='/login/logout'">Log Out</button>
 
+            <button id="menu-toggle" class="navbar-button">Menu</button>
+            <div id="submenu" class="submenu">
+                <button id="reports" class="navbar-button admin-only" onclick="window.location.href='reports.html'">Reports</button>
+                <button id="create-new-product" class="navbar-button admin-only">Product Creation</button>
+                <button id="create-new-employee" class="navbar-button admin-only">Employee Creation</button>
+                <button id="create-new-user" class="navbar-button admin-only">User Creation</button>
+                <button class="navbar-button" onclick="window.location.href='/login/logout'">Log Out</button>
+            </div>
         </nav>
     </div>
 </header>
+
 
 
 <section class="search-section">

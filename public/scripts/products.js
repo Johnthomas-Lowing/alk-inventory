@@ -40,13 +40,14 @@ async function handleEmployeeCreation() {
 }
 
 async function prepareActionModal(action) {
-     if (!action || action === 'action') {
+    if (!action || action === 'action') {
         alert('Please choose a valid action.');
         return;
     }
 
     const selectedItems = Array.from(document.querySelectorAll('.select-item:checked'));
     const itemIds = selectedItems.map(item => item.dataset.id);
+    
 
     if (action === 'create') {
         const modalContent = {
@@ -71,12 +72,14 @@ async function prepareActionModal(action) {
         return;
     }
 
+    let itemsToFetch = itemIds.slice();
+
     try {
-        const response = await fetch(`/inventory?ids=${itemIds.join(',')}`);
+        const response = await fetch(`/inventory?ids=${itemsToFetch.join(',')}`);
         if (!response.ok) throw new Error('Failed to fetch item details.');
 
         const items = await response.json();
-        const filteredItems = items.filter(item => itemIds.includes(item._id));
+        const filteredItems = items.filter(item => itemsToFetch.includes(item._id));
 
         let formContent = `
             <input type="hidden" name="action" value="${action.toLowerCase()}" />
@@ -85,6 +88,8 @@ async function prepareActionModal(action) {
                 <thead>
                     <tr>
                         <th>Item</th>
+                        <th>Size</th>
+                        <th>Color</th>
                         ${action !== 'Delete' ? `<th>Starting Quantity</th><th>Input Quantity</th>` : ''}
                         ${action === 'Check-in' ? `<th>Input Cost</th>` : ''}
                         ${action === 'Delete' ? `<th>Location</th>` : ''}
@@ -94,6 +99,8 @@ async function prepareActionModal(action) {
                     ${filteredItems.map(item => `
                         <tr>
                             <td>${item.name}</td>
+                            <td>${item.size || 'N/A'}</td>
+                            <td>${item.color || 'N/A'}</td>
                             ${action !== 'Delete' ? `
                                 <td>${item.quantity}</td>
                                 <td>
@@ -112,7 +119,7 @@ async function prepareActionModal(action) {
                     `).join('')}
                     ${action === 'Check-out' ? `
                         <tr>
-                            <td colspan="${action === 'Check-in' ? '4' : '3'}">
+                            <td colspan="${action === 'Check-in' ? '5' : '4'}">
                                 <label for="employeeName">Employee Name:</label>
                                 <select id="employeeName" name="employeeName" required></select>
                             </td>
@@ -154,6 +161,7 @@ async function prepareActionModal(action) {
     }
 }
 
+
 async function handleModalSubmit(event) {
     event.preventDefault(); // Prevent default form submission behavior
 
@@ -165,10 +173,6 @@ async function handleModalSubmit(event) {
 
     const formData = new FormData(form);
     const action = formData.get('action');
-    const idsString = formData.get('ids');
-    const ids = idsString ? idsString.split(',') : [];
-
-    console.log('Form Data:', { action, ids }); // Debugging log
 
     switch (action) {
         case 'create':
@@ -269,6 +273,8 @@ async function handleCreateEmployee(formData) {
     }
 }
 
+
+
 async function handleInventoryAction(action, formData, ids) {
     const cartItems = ids.map(id => ({
         _id: id,
@@ -348,7 +354,6 @@ function updateButtonVisibility(userData) {
         adminOnlyButtons.forEach(button => button.style.display = 'none');
     }
 }
-
 
 //Inventory & Search
 async function fetchEmployees() {
@@ -650,6 +655,21 @@ function setupEventListeners() {
     });
 
     document.querySelector('.inventory-grid').addEventListener('click', handleTableCellClick);
+
+
+   // JavaScript to handle submenu toggle
+document.getElementById('menu-toggle').addEventListener('click', function() {
+    const submenu = document.getElementById('submenu');
+    submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+});
+
+// Hide submenu when an item is clicked
+document.querySelectorAll('#submenu .navbar-button').forEach(item => {
+    item.addEventListener('click', function() {
+        const submenu = document.getElementById('submenu');
+        submenu.style.display = 'none';
+    });
+});   
 }
 
 document.addEventListener('DOMContentLoaded', () => {

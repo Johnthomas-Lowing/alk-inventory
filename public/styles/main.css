@@ -7,14 +7,34 @@
             padding: 0;
             padding-top: 2em;
         }
-        
-        .search-section {
-            padding: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 60px; /* Adjust for banner height */
-        }
+      .search-section {
+    padding: 20px;
+    display: flex;
+    flex-direction: row; /* Default layout for larger screens */
+    gap: 10px;
+    justify-content: center;
+    margin-top: 60px; /* Adjust for banner height */
+}
+
+@media (max-width: 850px) {
+    .search-section {
+        flex-direction: column; /* Stack items vertically */
+    }
+    
+    .search-section button {
+        width: 100%; /* Make the search button span the full width */
+        margin-bottom: 10px; /* Add space below the button */
+    }
+    
+    .search-section input[type="text"], 
+    .search-section button,
+    .search-section select {
+        width: auto; /* Reset width for the other elements */
+        margin: 0; /* Remove margins */
+    }
+}
+
+
         input[type="text"], 
         button, 
         select {
@@ -32,7 +52,7 @@
             background-size: 1em; /* Adjust size of the arrow */
         }
         .search-section input[type="text"] {
-            width: 20em;
+            width: auto;
             padding-left: 20px; /* Padding to align text inside the rounded input */
         }
         button {
@@ -166,5 +186,6 @@ input[type="checkbox"]:checked + .custom-checkbox::before {
     font-size: 16px; /* Adjust size as needed */
     line-height: 20px; /* Align the X */
 }
+
 
 

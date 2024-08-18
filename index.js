@@ -59,7 +59,7 @@ app.use('/session', loginRoutes);
 
 // Protected routes
 app.use('/reports', isAuthenticated, reportRoutes);
-app.use('/inventory', isAuthenticated, inventoryRoutes);
+app.use('/inventory', inventoryRoutes);
 app.use('/employee', isAuthenticated, employeeRoutes);
 app.use('/users', isAuthenticated, userRoutes);
 

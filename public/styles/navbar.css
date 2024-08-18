@@ -37,3 +37,82 @@
     background-color: white;
     color: black;
 }
+
+.submenu {
+    display: none; /* Hidden by default */
+    background-color: #fff; /* Or your desired background color */
+    border: 1px solid #ddd; /* Optional: border around the submenu */
+    position: absolute; /* Adjust as needed */
+    top: 50px; /* Adjust based on your layout */
+    right: 0; /* Adjust based on your layout */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: shadow effect */
+    z-index: 1000; /* Ensure it appears above other content */
+    border-radius: 8px; /* Adjust the value for more or less rounding */
+}
+.submenu button {
+    color: black;
+}
+
+.navbar-button {
+    /* Your existing button styles */
+    display: block; /* Make buttons block level inside submenu */
+    padding: 10px; /* Adjust padding as needed */
+    text-align: left; /* Align text to the left */
+}
+
+#menu-toggle {
+    /* Styles for the menu toggle button */
+}
+
+#menu-toggle:focus + #submenu,
+#submenu:hover {
+    display: block; /* Show submenu on hover or when menu button is focused */
+}
+
+
+/* Styles for wider screens (850px and above) */
+@media (min-width: 850px) {
+    .submenu {
+        display: none; /* Hide submenu dropdown */
+    }
+
+    .banner-menu {
+        display: flex; /* Display items across the banner */
+        justify-content: space-around; /* Adjust as needed */
+    }
+
+    .banner-menu li {
+        display: block; /* Display items as block-level elements in the banner */
+        padding: 10px; /* Adjust padding as needed */
+        text-align: center; /* Center align text */
+    }
+}
+
+/* Styles for smaller screens (less than 850px) */
+@media (max-width: 849px) {
+    .submenu {
+        display: none; /* Hidden by default */
+        background-color: #fff; /* Or your desired background color */
+        border: 1px solid #ddd; /* Optional: border around the submenu */
+        position: absolute; /* Adjust as needed */
+        top: 50px; /* Adjust based on your layout */
+        right: 0; /* Adjust based on your layout */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: shadow effect */
+        z-index: 1000; /* Ensure it appears above other content */
+        border-radius: 8px; /* Rounded corners */
+    }
+
+    #menu-toggle {
+        display: block; /* Show the menu toggle button */
+    }
+
+    .banner-menu {
+        display: none; /* Hide items across the banner */
+    }
+
+    /* Display submenu on toggle button click */
+    #menu-toggle:focus + .submenu,
+    .submenu:hover {
+        display: block; /* Show submenu when toggle button is focused or hovered */
+    }
+}
