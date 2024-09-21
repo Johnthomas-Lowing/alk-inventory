@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALK | Log-In</title>
     <link rel="icon" href="./resources/favi.png" type="image/x-icon">
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/login.css">
 </head>
 <body>
     <div id="login-page">
@@ -19,37 +19,45 @@
         </div>
 
         <footer id="login-footer">
-            <p>&copy; <span id="currentYear"></span> JTML</p>
+            <br>
+            <br>
+            <p>&copy; <span id="currentYear"></span></p>
+            <p>ALK Global Security Solutions</p>
+            <p>All Rights Reserved.</p>
+            <p>JTML</p>
         </footer>
     </div>
-    <script>
-        async function login(event) {
-    event.preventDefault();
+<script>
+    const currentYear = new Date().getFullYear();
+    document.getElementById('currentYear').textContent = currentYear;
 
-    const username = document.getElementById('username').value.toLowerCase();
-    const password = document.getElementById('password').value;
+    async function login(event) {
+        event.preventDefault();
 
-    try {
-        const response = await fetch('/login/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-            credentials: 'same-origin'
-        });
+        const username = document.getElementById('username').value.toLowerCase();
+        const password = document.getElementById('password').value;
 
-        const data = await response.json();
+        try {
+            const response = await fetch('/login/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+                credentials: 'same-origin'
+            });
 
-        if (response.ok) {
-            window.location.href = '/products.html';
-        } else {
-            alert(data.error || 'An unexpected error occurred. Please try again.');
+            const data = await response.json();
+
+            if (response.ok) {
+                window.location.href = '/products.html';
+            } else {
+                alert(data.error || 'An unexpected error occurred. Please try again.');
+            }
+        } catch (err) {
+            console.error('An error occurred:', err);
+            alert('An unexpected error occurred. Please try again later.');
         }
-    } catch (err) {
-        console.error('An error occurred:', err);
-        alert('An unexpected error occurred. Please try again later.');
     }
-}
+</script>
 
-    </script>
 </body>
 </html>

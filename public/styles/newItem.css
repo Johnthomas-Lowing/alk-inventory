@@ -1,0 +1,35 @@
+
+
+/* Style for the new item row container */
+.new-item-row-container {
+    display: flex;
+    justify-content: space-between; /* Distribute space evenly between items */
+    align-items: center; /* Center items vertically */
+    padding: 10px;
+}
+
+/* Style for input fields */
+.new-item-row-container input {
+    flex: 1; /* Make each input field take up equal space */
+    margin: 0 5px; /* Add some space between fields */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+/* Style for the Add Item button */
+.new-item-row-container button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50; /* Change to your desired color */
+    color: white;
+    cursor: pointer;
+    flex: none; /* Prevent the button from growing */
+}
+
+/* Optional: Add hover effect for the button */
+.new-item-row-container button:hover {
+    background-color: #45a049; /* Darker shade for hover */
+}

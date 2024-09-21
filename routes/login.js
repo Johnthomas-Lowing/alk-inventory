@@ -13,19 +13,19 @@ router.post('/login', async (req, res) => {
 
         const user = await User.findOne({ username });
         if (!user || !(await user.verifyPassword(password))) {
-            return res.status(401).json({ error: 'Your account details are incorrect. Check your username and password. Contact your system\'s administrator for further assistance.' });
+            return res.status(401).json({ error: 'Invalid username or password' });
         }
 
-        // Set session data including role
         req.session.username = username;
         req.session.role = user.role;
 
         res.status(200).json({ message: 'Login successful', username: username, role: user.role });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Login error:', err); // Log detailed error
+        res.status(500).json({ error: 'Internal Server Error', details: err.message });
     }
 });
+
 
 router.get('/session', (req, res) => {
     if (req.session.username) {
