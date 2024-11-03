@@ -4,6 +4,7 @@ import { isAuthenticated } from '../middleware/auth.js'; // Import middleware
 
 const router = express.Router();
 
+<<<<<<< Updated upstream
 // Function to convert strings to Title Case
 function toTitleCase(str) {
     return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
@@ -214,9 +215,40 @@ router.get('/filter', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Failed to filter inventory' });
+=======
+router.get('/items', async (req, res) => {
+  try {
+    const { name, size, color, location, id } = req.query;
+
+    // If an id is provided, fetch the item by id
+    if (id) {
+      const item = await Item.findById(id);
+      if (item) {
+        return res.json(item);  // Return the single item
+      } else {
+        return res.status(404).json({ message: 'Item not found' });
+      }
+    }
+
+    // Existing filters for name, size, color, and location
+    let filter = {};
+    if (name) filter.name = name;
+    if (size) filter.size = size;
+    if (color) filter.color = color;
+    if (location && location !== 'all') filter.location = location;
+
+    // Find items based on the filter criteria
+    const items = await Item.find(filter);
+
+    if (items.length > 0) {
+      res.json(items);
+    } else {
+      res.status(404).json({ message: 'No items found' });
+>>>>>>> Stashed changes
     }
 });
 
+<<<<<<< Updated upstream
 // GET request to read inventory item by ID
 router.get('/:id', async (req, res) => {
     try {
@@ -226,6 +258,23 @@ router.get('/:id', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Failed to retrieve inventory item' });
+=======
+
+
+// Route to update item quantity
+router.post('/items/updateQuantity', async (req, res) => {
+  console.log('Received update request:', req.body);
+  try {
+    const { name, size, color, quantity } = req.body;
+
+    console.log('Received update request:', { name, size, color, quantity });
+
+    // Find the item first
+    const item = await Item.findOne({ name, size, color });
+
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Item not found' });
+>>>>>>> Stashed changes
     }
 });
 

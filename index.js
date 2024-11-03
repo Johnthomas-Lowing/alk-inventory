@@ -8,9 +8,16 @@ import loginRoutes from './routes/login.js';
 import inventoryRoutes from './routes/inventory.js';
 import reportRoutes from './routes/report.js';
 import userRoutes from './routes/user.js';
+<<<<<<< Updated upstream
 import employeeRoutes from './routes/employee.js';
 import connectDB from './db.js';
 import { isAuthenticated } from './middleware/auth.js'; // Import the middleware
+=======
+import guardRoutes from './routes/guard.js';  // Add this line to import the guards route
+
+
+
+>>>>>>> Stashed changes
 
 const app = express();
 const PORT = 8080;
@@ -59,9 +66,16 @@ app.use('/session', loginRoutes);
 
 // Protected routes
 app.use('/reports', isAuthenticated, reportRoutes);
+<<<<<<< Updated upstream
 app.use('/inventory', inventoryRoutes);
 app.use('/employee', isAuthenticated, employeeRoutes);
 app.use('/users', isAuthenticated, userRoutes);
+=======
+app.use('/api', inventoryRoutes);
+app.use('/users', userRoutes);
+app.use('/guards', guardRoutes);  // Add this line to handle guards
+
+>>>>>>> Stashed changes
 
 
 // Start the server

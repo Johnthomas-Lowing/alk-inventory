@@ -14,6 +14,7 @@
 <header>
     <div class="banner">
         <img class="logo" src="resources/logo-wide-white.png" alt="Logo">
+<<<<<<< Updated upstream
         <nav class="navbar">
 
             <button id="menu-toggle" class="navbar-button">Menu</button>
@@ -23,6 +24,27 @@
                 <button id="create-new-employee" class="navbar-button admin-only">Employee Creation</button>
                 <button id="create-new-user" class="navbar-button admin-only">User Creation</button>
                 <button class="navbar-button" onclick="window.location.href='/login/logout'">Log Out</button>
+=======
+        <section>
+            <div class="selector">
+                <label class="dropdown">Sort By:</label>
+                <select class="dropdown" id="tool-dropdown">
+                    <option value="assets">Location</option>
+                    <option value="tracker">Employee</option>
+                    <!-- Add more locations as needed -->
+                </select>
+            </div>
+        </section>
+        <section>
+            <div class="selector">
+                <label class="dropdown" for="location-dropdown">Location:</label>
+                <select class="dropdown" id="location-dropdown">
+                    <option value="Vancouver">Vancouver</option>
+                    <option value="Arizona">Arizona</option>
+                    <option value="Seattle">Seattle</option>
+                    <!-- Add more locations as needed -->
+                </select>
+>>>>>>> Stashed changes
             </div>
         </nav>
     </div>
@@ -43,6 +65,7 @@
     <button id="reset-btn">Reset</button>
     
 </section>
+<<<<<<< Updated upstream
 
 <section class="inventory-grid">
     <table>
@@ -83,6 +106,13 @@
 <div class="commit-button-container">
     <button id="commit-btn">make it happen</button>
 </div>
+=======
+<script type="text/javascript" src="scripts/eventListeners.js"></script>
+<script type="text/javascript" src="scripts/logout.js"></script>
+<script type="text/javascript" src="scripts/action.js"></script>
+<script type="text/javascript" src="scripts/tableCons.js"></script>
+<script type="text/javascript" src="scripts/newItems.js"></script>
+>>>>>>> Stashed changes
 <script type="text/javascript" src="scripts/auth.js"></script>
 <script type="text/javascript" src="scripts/products.js"></script>
 </body>
