@@ -16,9 +16,19 @@
     <div class="banner">
         <img class="logo" src="resources/logo-wide-white.png" alt="Logo">
         <section>
-            <div class="location-selector">
-                <label for="location-dropdown">Location:</label>
-                <select id="location-dropdown">
+            <div class="selector">
+                <label class="dropdown">Sort By:</label>
+                <select class="dropdown" id="tool-dropdown">
+                    <option value="assets">Location</option>
+                    <option value="tracker">Employee</option>
+                    <!-- Add more locations as needed -->
+                </select>
+            </div>
+        </section>
+        <section>
+            <div class="selector">
+                <label class="dropdown" for="location-dropdown">Location:</label>
+                <select class="dropdown" id="location-dropdown">
                     <option value="Vancouver">Vancouver</option>
                     <option value="Arizona">Arizona</option>
                     <option value="Seattle">Seattle</option>
@@ -26,7 +36,7 @@
                 </select>
             </div>
         </section>
-        <button class="logout-button" id="logout-button">Logout</button> <!-- Logout button -->
+        <button class="logout-button" id="logout-button">Logout</button>
     </div>
 </header>
 
@@ -46,8 +56,6 @@
             </thead>
             <tbody>
                 <!-- Rows will be dynamically inserted here -->
-                
-                <!-- New row for adding an item -->
             </tbody>
             <tr id="new-item-row">
                 <td colspan="7">
@@ -65,6 +73,7 @@
     </div>
 </section>
 
+<script type="text/javascript" src="scripts/eventListeners.js"></script>
 <script type="text/javascript" src="scripts/logout.js"></script>
 <script type="text/javascript" src="scripts/action.js"></script>
 <script type="text/javascript" src="scripts/tableCons.js"></script>

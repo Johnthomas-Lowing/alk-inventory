@@ -3,6 +3,15 @@ function fetchAndDisplayItems(location) {
   fetch(`/api/items?location=${encodeURIComponent(location)}`)
     .then(response => response.json())
     .then(data => {
+      // Ensure data is an array to avoid errors
+      if (!Array.isArray(data)) {
+        console.error('Expected an array, received:', data);
+        data = []; // Fallback to an empty array if data is not an array
+      }
+
+      // Sort the data alphabetically by item name
+      data.sort((a, b) => a.name.localeCompare(b.name));
+
       const tableBody = document.querySelector('#inventory-table tbody');
       tableBody.innerHTML = ''; // Clear current table rows
 
@@ -88,7 +97,6 @@ function createQuantityInput(quantity) {
   `;
 }
 
-
 // Event listener for location change
 document.getElementById('location-dropdown').addEventListener('change', () => {
   const selectedLocation = document.getElementById('location-dropdown').value;
@@ -99,4 +107,3 @@ document.getElementById('location-dropdown').addEventListener('change', () => {
 document.addEventListener('DOMContentLoaded', () => {
   fetchAndDisplayItems('Vancouver'); // Default location
 });
-
