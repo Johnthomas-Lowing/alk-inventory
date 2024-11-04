@@ -5,26 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ALK | Assets</title>
     <link rel="icon" href="./resources/favi.png" type="image/x-icon">
-    <link rel="stylesheet" type="text/css" href="styles/modalStyles.css">
-    <link rel="stylesheet" type="text/css" href="styles/main.css">
-    <link rel="stylesheet" type="text/css" href="styles/navbar.css">     
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aptos:wght@400;700&display=swap">
+    <link rel="stylesheet" type="text/css" href="styles/table.css">  
+    <link rel="stylesheet" type="text/css" href="styles/banner.css">
+    <link rel="stylesheet" type="text/css" href="styles/newItem.css"> 
 </head>
 <body>
 
 <header>
     <div class="banner">
         <img class="logo" src="resources/logo-wide-white.png" alt="Logo">
-<<<<<<< Updated upstream
-        <nav class="navbar">
-
-            <button id="menu-toggle" class="navbar-button">Menu</button>
-            <div id="submenu" class="submenu">
-                <button id="reports" class="navbar-button admin-only" onclick="window.location.href='reports.html'">Reports</button>
-                <button id="create-new-product" class="navbar-button admin-only">Product Creation</button>
-                <button id="create-new-employee" class="navbar-button admin-only">Employee Creation</button>
-                <button id="create-new-user" class="navbar-button admin-only">User Creation</button>
-                <button class="navbar-button" onclick="window.location.href='/login/logout'">Log Out</button>
-=======
         <section>
             <div class="selector">
                 <label class="dropdown">Sort By:</label>
@@ -44,77 +34,50 @@
                     <option value="Seattle">Seattle</option>
                     <!-- Add more locations as needed -->
                 </select>
->>>>>>> Stashed changes
             </div>
-        </nav>
+        </section>
+        <button class="logout-button" id="logout-button">Logout</button>
     </div>
 </header>
 
-
-
-<section class="search-section">
-    <select id="category-dropdown">
-        <option value="">Location</option>
-        <option value="Vancouver">Vancouver</option>
-        <option value="Seattle">Seattle</option>
-        <option value="Phoenix">Phoenix</option>
-        <option class='admin-only'value="Employees">Employees</option>
-    </select>
-    <input type="text" placeholder="Search" id="search">
-    <button id="search-btn">Search</button>
-    <button id="reset-btn">Reset</button>
-    
-</section>
-<<<<<<< Updated upstream
-
 <section class="inventory-grid">
-    <table>
-        <thead>
-            <tr>
-                <th>
-                    <select id="action-select" style="border: none;" id="action-dropdown">
-                        <option value="">Action</option>
-                        <option value="Check-in">Check-in</option>
-                        <option value="Check-out">Check-out</option>
-                        <option class="admin-only" style="color: red" value="Delete">Delete</option>
-                    </select>
-                </th>
+    <div class="table-container">
+        <table id="inventory-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Color</th>
+                    <th>Quantity</th>
+                    <th>Cost</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be dynamically inserted here -->
+            </tbody>
+            <tr id="new-item-row">
+                <td colspan="7">
+                    <div class="new-item-row-container">
+                        <input type="text" id="new-item-name" placeholder="Item Name">
+                        <input type="text" id="new-item-size" placeholder="Size">
+                        <input type="text" id="new-item-color" placeholder="Color">
+                        <input type="number" id="new-item-quantity" min="0" placeholder="Quantity">
+                        <input type="number" id="new-item-cost" min="0" placeholder="Cost">
+                        <button id="add-new-item">Add Item</button>
+                    </div>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            <!-- Dynamic rows will be inserted here -->
-        </tbody>
-    </table>
+        </table>
+    </div>
 </section>
 
-
-
-<!-- General Modal -->
-<div id="general-modal" class="modal">
-    <div class="modal-content">
-        <span class="modal-close" onclick="closeModal()">&times;</span>
-        <h2 id="modal-header">Header</h2>
-        <div id="modal-body"></div>
-        <form id="modal-form"></form>
-        <button id="modal-confirm-btn" type="button">Confirm</button>
-        <button id="modal-cancel-btn" type="button">Cancel</button>
-    </div>
-</div>
-
-
-
-<div class="commit-button-container">
-    <button id="commit-btn">make it happen</button>
-</div>
-=======
 <script type="text/javascript" src="scripts/eventListeners.js"></script>
 <script type="text/javascript" src="scripts/logout.js"></script>
 <script type="text/javascript" src="scripts/action.js"></script>
 <script type="text/javascript" src="scripts/tableCons.js"></script>
 <script type="text/javascript" src="scripts/newItems.js"></script>
->>>>>>> Stashed changes
 <script type="text/javascript" src="scripts/auth.js"></script>
-<script type="text/javascript" src="scripts/products.js"></script>
 </body>
 </html>
-

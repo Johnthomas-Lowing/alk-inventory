@@ -1,3 +1,4 @@
+// Fetch items from the backend and populate the table
 function fetchAndDisplayItems(location) {
   fetch(`/api/items?location=${encodeURIComponent(location)}`)
     .then(response => response.json())
@@ -85,8 +86,6 @@ function fetchAndDisplayItems(location) {
     .catch(error => console.error('Error fetching items:', error));
 }
 
-
-
 // Function to create a quantity input with buttons
 function createQuantityInput(quantity) {
   return `
@@ -98,7 +97,6 @@ function createQuantityInput(quantity) {
   `;
 }
 
-
 // Event listener for location change
 document.getElementById('location-dropdown').addEventListener('change', () => {
   const selectedLocation = document.getElementById('location-dropdown').value;
@@ -109,4 +107,3 @@ document.getElementById('location-dropdown').addEventListener('change', () => {
 document.addEventListener('DOMContentLoaded', () => {
   fetchAndDisplayItems('Vancouver'); // Default location
 });
-

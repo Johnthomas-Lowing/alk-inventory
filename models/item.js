@@ -9,7 +9,6 @@ const itemSchema = new Schema({
   size: { type: String, required: true },  
   color: { type: String, required: true }, 
   quantity: { type: Number, required: true },
-  assignment: {type: String, required: true},
   cost : { type: Number, required: true },
   created_at: {
         type: Date,

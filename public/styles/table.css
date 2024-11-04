@@ -1,0 +1,133 @@
+/* Ensure the table takes up the full width of its container */
+.table-container {
+    max-width: 100%; /* Adjust to percentage */
+    margin: 2em auto;
+    margin-top: 4em;
+    overflow-x: auto; /* For horizontal scrolling on smaller screens */
+}
+
+#inventory-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove double borders */
+    font-family: Arial, sans-serif;
+    margin: 2em 0;
+}
+
+/* Style the table headers */
+#inventory-table thead {
+    background-color: #333;
+    color: #fff;
+}
+
+#inventory-table th {
+    padding: 1em;
+    text-align: left;
+    border-bottom: 0.2em solid #ddd;
+}
+
+/* Style the table rows */
+#inventory-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#inventory-table tbody tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+#inventory-table td {
+    padding: 1em;
+    border-bottom: 0.1em solid #ddd;
+    text-align: left;
+}
+
+/* Optional: Add a hover effect to rows */
+#inventory-table tbody tr:hover {
+    background-color: #e0e0e0;
+}
+
+/* Optional: Add a border around the table */
+#inventory-table {
+    border: 0.1em solid #ddd;
+    border-radius: 0.4em; /* Rounded corners */
+    overflow: hidden; /* For rounded corners to be visible */
+}
+
+/* Add this CSS rule for the images inside the table */
+#inventory-table img {
+    max-width: 3em; /* Set the maximum width */
+    max-height: 3em; /* Set the maximum height */
+    object-fit: contain; /* Ensure the image fits within the specified dimensions */
+    border-radius: 0.4em; /* Optional: add some rounding to the image corners */
+}
+
+#inventory-table input {
+    width: 2.5em;
+    padding: 0.5em;
+    border: 0.1em solid #ddd;
+    border-radius: 0.4em;
+    box-sizing: border-box;
+    text-align: center; /* Center the text in the input box */
+    font-size: 1em; /* Ensure font size is consistent */
+    line-height: 1.5; /* Adjust line-height for vertical centering */
+    margin: 0; /* Remove any default margin that might affect centering */
+}
+
+/* Style for quantity buttons */
+#inventory-table button {
+    padding: 0.5em 1em;
+    border: 0.1em solid #ddd;
+    border-radius: 0.4em;
+    background-color: #f4f4f4;
+    color: #333;
+    font-size: 1em; /* Adjust as needed */
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.quantity-button {
+    width: 2.5em; /* Set a fixed width for both buttons */
+    height: 2.5em; /* Set a fixed height to ensure both buttons are square */
+    border: 0.1em solid #ddd;
+    border-radius: 0.4em;
+    background-color: #f4f4f4;
+    color: #333;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center the button text inside the button */
+    box-sizing: border-box; /* Include padding and border in the button size */
+}
+/* Center input and buttons using flex */
+.input-button-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Normalize dropdown sizes in the table */
+#inventory-table select {
+    width: 100%; /* Makes the dropdown take the full width of its container cell */
+    max-width: 10em; /* Adjust as needed for your layout */
+    padding: 0.5em;
+    border: 0.1em solid #ddd;
+    border-radius: 0.4em; /* Optional: add some rounding to the dropdown corners */
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+/* Hide the default spinner controls for number inputs */
+#inventory-table input[type="number"]::-webkit-inner-spin-button,
+#inventory-table input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#inventory-table input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+
+body {
+    font-family: 'Aptos', sans-serif;
+}
